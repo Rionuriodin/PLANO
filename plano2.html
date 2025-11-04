@@ -1,0 +1,904 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Dashboard Planogram Digital - RIO NURIODIN</title>
+    <meta charset="UTF-8"> <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700&family=Poppins:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    
+    <style>
+        /* ===========================================
+            GABUNGAN CSS & STYLE UMUM
+            =========================================== */
+        body { 
+            /* Diperbarui: Menambahkan 'Noto Sans KR' sebagai fallback untuk Hangul */
+            font-family: 'Poppins', 'Noto Sans KR', sans-serif; 
+            margin: 0; padding: 0; 
+            color: white; 
+            background-color: #001f3f; 
+            background-size: 110%; 
+            background-attachment: fixed; 
+            background-position: center center;
+            display: flex; justify-content: center; align-items: flex-start; min-height: 100vh; 
+            flex-direction: column; 
+            position: relative; 
+            animation: backgroundZoom 30s infinite alternate linear;
+        }
+        
+        .top-header {
+            width: 100%;
+            padding: 10px 0;
+            background-color: rgba(0, 0, 0, 0.6); 
+            color: white;
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 1);
+            position: sticky; 
+            top: 0;
+            z-index: 100;
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            flex-wrap: wrap; /* Untuk tampilan responsif */
+        }
+
+        #digital-clock {
+            font-size: 1.5em;
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 5px;
+            color: #f1c40f; 
+            flex-grow: 1; 
+            padding: 0 10px;
+        }
+
+        /* PERUBAHAN CSS UNTUK LYRIC RUNNING */
+        #running-text-wrapper {
+            width: 100%;
+            overflow: hidden;
+            text-align: center;
+            position: relative; /* Menjadi relatif untuk menjaga flow */
+            top: auto; 
+            left: auto;
+            transform: none;
+            pointer-events: none; 
+            z-index: 90; 
+            padding: 5px 0; 
+            background-color: rgba(0, 0, 0, 0.4); /* subtle background for the lyrics bar */
+        }
+
+        #running-text {
+            display: inline-block;
+            white-space: nowrap;
+            font-size: 1em;
+            font-weight: 600;
+            /* Hapus Marquee styles */
+            padding: 0 20px; 
+            animation: none;
+            /* Tambah transisi fade untuk perpindahan lirik */
+            transition: opacity 0.5s ease-in-out; 
+            opacity: 1;
+            color: #f1c40f; /* Warna lirik */
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+        }
+        
+        /* HAPUS KEYFRAME MARQUEE LAMA */
+        /* @keyframes marquee dihapus */
+
+        body:before {
+            content: '';
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            z-index: -1; 
+            background-size: 110%; 
+            background-attachment: fixed; 
+            background-position: center center;
+            transition: opacity 3s ease-in-out; 
+            opacity: 0; 
+            filter: brightness(0.3) saturate(0.5) blur(1px); 
+            animation: backgroundZoom 30s infinite alternate linear;
+        }
+
+        @keyframes backgroundZoom {
+            0% { background-size: 110%; background-position: center center; }
+            100% { background-size: 105%; background-position: center top; }
+        }
+
+        .container { 
+            max-width: 1200px; width: 95%; margin: 30px auto 0; 
+            padding: 30px; 
+            flex-grow: 1; 
+            position: relative; 
+        }
+
+        h1 { 
+            text-align: center; color: white; margin-bottom: 30px; padding-bottom: 10px; 
+            border-bottom: 2px solid #bdc3c7; font-size: 2.2em; font-weight: 900; 
+            text-transform: uppercase; 
+            text-shadow: 0 0 5px rgba(0, 0, 0, 1), 0 0 15px rgba(0, 0, 0, 0.8); 
+        }
+
+        h2 { 
+            color: white; font-size: 1.4em; margin-top: 0; margin-bottom: 15px; 
+            padding-left: 10px; border-left: 4px solid #3498db; 
+            font-weight: 600;
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.9); 
+        }
+
+        .modal { 
+            background-color: rgba(0,0,0,0.8); 
+            display: none; 
+            position: fixed; z-index: 2000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; 
+            display: flex; 
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content { 
+            background-color: rgba(255, 255, 255, 0.1); 
+            backdrop-filter: blur(5px); 
+            margin: auto; 
+            padding: 30px; border: none; max-width: 450px; border-radius: 15px; 
+            text-align: center; 
+            box-shadow: 0 5px 20px rgba(0,0,0,0.5); 
+            animation: zoomIn 0.3s; 
+            color: white; 
+            border: 1px solid rgba(255, 255, 255, 0.2); 
+        }
+
+        .modal-content img.modal-image {
+            max-width: 90%;
+            height: auto;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+            max-height: 250px; 
+            object-fit: contain; 
+            background-color: white; 
+            padding: 5px;
+        }
+
+        .close-button { 
+            background-color: #e74c3c; 
+            color: white; padding: 12px 25px; border: none; border-radius: 5px; cursor: pointer; 
+            transition: background-color 0.2s; font-weight: 600;
+            margin-top: 25px;
+        }
+
+        .close-button:hover { background-color: #c0392b; }
+
+        .tab-buttons { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin-bottom: 30px; }
+        
+        .tab-button { 
+            background-color: rgba(255, 255, 255, 0.2); color: white; padding: 12px 18px; 
+            border: 1px solid rgba(255, 255, 255, 0.5); border-radius: 5px; cursor: pointer; 
+            transition: all 0.3s; font-weight: 600; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5); 
+        }
+
+        .tab-button:hover { background-color: rgba(255, 255, 255, 0.4); }
+
+        .tab-button.active { background-color: #3498db; color: white; border-color: #3498db; box-shadow: 0 0 10px rgba(52, 152, 219, 0.8); }
+
+        .folder-panel { display: none; }
+
+        #folder1 { display: block; }
+        
+        .iframe-wrapper { 
+            position: relative; width: 100%; padding-top: 56.25%; height: 0; overflow: hidden; margin: 20px auto 0 auto; max-width: 900px; 
+            background-color: rgba(255, 255, 255, 0.9); border: 1px solid #bdc3c7; border-radius: 5px; box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+        }
+
+        .drive-iframe { 
+            position: absolute; 
+            top: 0; 
+            left: 0; 
+            width: 100%; 
+            height: 100%; 
+            border: none; 
+        }
+
+
+        /* ===========================================
+            MODIFIKASI SLIDE CONTAINER (HANYA POTRET - Rasio dan Dimensi Tetap)
+            =========================================== */
+        
+        .music-instruction {
+            text-align: center;
+            color: #f1c40f;
+            font-weight: 700;
+            margin-bottom: 10px;
+            font-size: 1.1em;
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.8);
+        }
+
+        /* Container Rotasi (Viewport) - Rasio Potret Tetap (141.49%) */
+        .slide-rotator {
+            position: relative;
+            max-width: 636px; /* Ukuran Potret Ideal (900px / 1.4149) */
+            margin: 20px auto 30px auto; 
+            overflow: hidden; 
+            background-color: transparent !important; 
+            padding-top: 141.49%; /* Rasio Potret (Tinggi/Lebar) */
+            height: 0; 
+        }
+        
+        /* Slide Wrapper */
+        .slides-wrapper {
+            position: absolute; 
+            top: 0;
+            left: 0;
+            width: 100%; 
+            height: 100%; 
+            opacity: 0; /* HIDE secara default */
+            transition: opacity 1s ease-in-out; 
+            padding-top: 0 !important; 
+            background-color: transparent !important; 
+        }
+        
+        /* Slide yang Aktif */
+        .slides-wrapper.active {
+            opacity: 1; /* Hanya tampil jika .active ditambahkan oleh JS */
+        }
+
+        /* Iframe di dalam wrapper */
+        .slides-wrapper iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+            background-color: transparent !important; 
+        }
+
+        /* ===========================================
+            STYLE BARU: DOWNLOAD DROPDOWN
+            =========================================== */
+        .download-container {
+            max-width: 600px;
+            margin: 20px auto 30px auto; /* Tambah margin bawah */
+            text-align: center;
+        }
+        .dropdown-toggle {
+            background-color: #e67e22; /* Orange */
+            color: white;
+            padding: 15px 25px;
+            font-size: 1.2em;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            width: 100%; 
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+            transition: background-color 0.3s, transform 0.1s;
+            font-weight: 700;
+            text-transform: uppercase;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .dropdown-toggle:hover {
+            background-color: #d35400;
+            transform: translateY(-1px);
+        }
+        .dropdown-toggle i {
+            margin-left: 10px;
+            transition: transform 0.3s;
+        }
+        .dropdown-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s ease-in-out, padding 0.4s ease-in-out;
+            background-color: rgba(0, 0, 0, 0.5);
+            border-radius: 0 0 8px 8px;
+            padding: 0 10px;
+            text-align: left;
+        }
+        .dropdown-content.show {
+            max-height: 500px; /* Cukup besar untuk menampung semua item */
+            padding: 15px 10px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-top: none;
+        }
+        .download-link {
+            display: block;
+            text-align: left;
+            color: #f1c40f; /* Yellow/Gold */
+            text-decoration: none;
+            padding: 12px 15px;
+            margin-bottom: 5px;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 5px;
+            transition: background-color 0.2s, color 0.2s;
+            font-weight: 600;
+            border-left: 5px solid #f1c40f;
+            cursor: pointer; /* Menandakan ini bisa diklik */
+        }
+        .download-link:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+            color: white;
+            border-left-color: white;
+        }
+        .dropdown-toggle.active i {
+            transform: rotate(180deg);
+        }
+
+        /* ===========================================
+            SPONSOR SECTION (TRANSPARANSI LOGO)
+            =========================================== */
+        .sponsor-section {
+            width: 100%;
+            background-color: rgba(0, 0, 0, 0.4);
+            padding: 20px 0;
+            text-align: center;
+            border-top: 1px solid rgba(255, 255, 255, 0.2);
+            margin-top: 30px;
+        }
+
+        .sponsor-section h3 {
+            font-size: 1.2em;
+            color: #f1c40f;
+            margin-bottom: 20px;
+            font-weight: 700;
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.9);
+        }
+
+        .sponsor-logos {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        /* Hilangkan background putih pada kontainer logo (gunakan transparent) */
+        .sponsor-logo {
+            flex-basis: 120px; 
+            height: 80px;
+            background-color: transparent; 
+            border-radius: 8px;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .sponsor-logo:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.7);
+        }
+
+        .sponsor-logo img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+            transition: opacity 0.3s;
+            /* Tambahkan filter untuk gambar logo non-transparan agar blending lebih baik */
+            filter: drop-shadow(0 0 1px rgba(0,0,0,0.5)); 
+        }
+
+        footer {
+            width: 100%;
+            padding: 10px 0;
+            background-color: rgba(0, 0, 0, 0.6); 
+            text-align: center;
+            font-size: 0.8em;
+            color: #bdc3c7;
+        }
+        
+        footer span {
+            color: #f1c40f;
+            font-weight: 600;
+        }
+
+
+        /* ===========================================
+            MEDIA QUERY 
+            =========================================== */
+        @media (max-width: 600px) { 
+            .container { padding: 20px 10px; }
+            h1 { font-size: 1.6em; }
+            .tab-button { padding: 8px 10px; font-size: 0.75em; }
+            .iframe-wrapper { max-width: 100%; }
+            #digital-clock { font-size: 1.2em; }
+            .top-header { flex-direction: column; }
+            #running-text-wrapper { position: relative; transform: none; margin-top: 10px; }
+            .slide-rotator {
+                margin: 10px auto 20px auto; 
+                max-width: 95%; 
+                padding-top: 141.49%; 
+            }
+            .sponsor-logos { gap: 3px; } 
+            .sponsor-logo { flex-basis: 100px; height: 60px;} 
+            .music-instruction { font-size: 0.9em; }
+            .dropdown-toggle { font-size: 1em; padding: 12px 20px; }
+        }
+        
+    </style>
+</head>
+<body>
+    
+    <div class="top-header">
+        
+        <div id="digital-clock"></div>
+        
+        <button onclick="unmuteMusic()" id="musicToggle" style="background:none; border:none; color:white; cursor:pointer; font-size: 1.5em; margin: 0 10px;" title="Putar/Hentikan Musik">
+            <i class="fas fa-volume-mute"></i>
+        </button>
+        <div id="running-text-wrapper">
+            <div id="running-text">
+                <i class="fas fa-compact-disc"></i> Klik SAYA MENGERTI untuk memulai musik & lirik.
+            </div>
+        </div>
+        </div>
+
+    <div id="welcomeModal" class="modal">
+        <div class="modal-content">
+            <h2 id="modal-title">PERHATIAN PENTING! <br><span style="font-size: 0.7em; font-weight: 400; color: #bdc3c7;">(Pesan Motivasi)</span></h2> 
+            
+            <img id="motivasi-image" class="modal-image" src="https://media.tenor.com/VhxJjl32gd4AAAAe/kakek-sugiono-kakek-sugiyono.png" alt="Gambar Motivasi" /> 
+            <p id="motivasi-greeting"></p> 
+            <p id="motivasi-message">Selamat datang! Dashboard ini berisi data Planogram terbaru.</p>
+            
+            <button class="close-button" onclick="closeModal()">SAYA MENGERTI</button>
+        </div>
+    </div>
+    
+    <div class="container">
+        <h1>DASHBOARD PLANOGRAM DIGITAL</h1>
+        
+        <div class="download-container">
+            <button class="dropdown-toggle" onclick="toggleDropdown()">DOWNLOAD APK IDM <i class="fas fa-chevron-down"></i></button>
+            <div class="dropdown-content" id="apkDropdown">
+                <a class="download-link" onclick="redirectToLink('https://ess-online.hrindomaret.com/')">ESS Online HP</a>
+                <a class="download-link" onclick="redirectToLink('https://portal.hrindomaret.com/')">Web Portal di HP</a>
+                <a class="download-link" onclick="redirectToLink('https://play.google.com/store/apps/details?id=com.indomaret.kbk')">Idm KBK Apk</a>
+                <a class="download-link" onclick="redirectToLink('https://apps.apple.com/us/app/indomaret-kbk/id6462614304')">Idm KBK IOS</a>
+                <a class="download-link" onclick="redirectToLink('https://play.google.com/store/apps/details?id=com.indomaret.orimobile')">ORI APK</a>
+                <a class="download-link" onclick="redirectToLink('https://apps.apple.com/app/ori-administation/id6446811034')">ORI IOS</a>
+                <a class="download-link" onclick="redirectToLink('https://play.google.com/store/apps/details?id=com.indomaret.oriadm')">ORI Administrasi APK</a>
+                <a class="download-link" onclick="redirectToLink('https://apps.apple.com/app/ori-administation/id6446811034')">ORI Administrasi IOS</a>
+                <a class="download-link" onclick="redirectToLink('https://docs.google.com/document/d/11IEOJ5AT7VrWQqiSOGiFWY2784LP0SzBiDNvgAqN3tU/edit?usp=drivesdk')">Instal CO Mobile Di HP</a>
+            </div>
+        </div>
+        <p class="music-instruction">
+         Untuk mendengarkan musik, bisa **swipe** slide, atau klik di area **SUPER HEMAT**.
+        </p>
+
+        <div class="slide-rotator">
+            
+            <div id="slide1" class="slides-wrapper">
+                <iframe 
+                    src="https://docs.google.com/presentation/d/1CGO1hwhm0kL_1NWdnto5zshadD_0EpqacKImo30YtAw/embed?loop=true&rm=minimal" 
+                    frameborder="0" 
+                    allowfullscreen="true" 
+                    mozallowfullscreen="true" 
+                    webkitallowfullscreen="true"
+                ></iframe>
+            </div>
+            
+        </div>
+        
+        <div class="tab-buttons">
+            <button class="tab-button active" id="btn-folder1" onclick="openFolder(event, 'folder1')">GONDOLA 1B</button>
+            <button class="tab-button" id="btn-folder2" onclick="openFolder(event, 'folder2')">GONDOLA 1A</button>
+            <button class="tab-button" id="btn-folder3" onclick="openFolder(event, 'folder3')">GONDOLA 2B</button>
+            <button class="tab-button" id="btn-folder4" onclick="openFolder(event, 'folder4')">GONDOLA 2A</button>
+            <button class="tab-button" id="btn-folder5" onclick="openFolder(event, 'folder5')">GONDOLA 4A</button>
+            <button class="tab-button" id="btn-folder6" onclick="openFolder(event, 'folder6')">GONDOLA 3A</button>
+            <button class="tab-button" id="btn-folder7" onclick="openFolder(event, 'folder7')">BANER OUT</button>
+            <button class="tab-button" id="btn-folder8" onclick="openFolder(event, 'folder8')">PALING MURAH DAN HEBOH</button>
+            <button class="tab-button" id="btn-folder9" onclick="openFolder(event, 'folder9')">DU DEPAN BELAKANG</button>
+            <button class="tab-button" id="btn-folder10" onclick="openFolder(event, 'folder10')">Foto Display</button>
+        </div>
+
+        <div class="tab-content">
+            <div id="folder1" class="folder-panel active"><h2>GONDOLA 1B</h2><div class="iframe-wrapper"><iframe class="drive-iframe" src="https://drive.google.com/embeddedfolderview?id=1kkDIKZbX5l7KyygZ66XLYhE-lhTEOhKX#grid" frameborder="0" allowfullscreen></iframe></div></div>
+            <div id="folder2" class="folder-panel"><h2>GONDOLA 1A</h2><div class="iframe-wrapper"><iframe class="drive-iframe" src="https://drive.google.com/embeddedfolderview?id=1BmzizFqsiCzDJGzZr2ndU_x60WxQsfug#grid" frameborder="0" allowfullscreen></iframe></div></div>
+            <div id="folder3" class="folder-panel"><h2>GONDOLA 2B</h2><div class="iframe-wrapper"><iframe class="drive-iframe" src="https://drive.google.com/embeddedfolderview?id=1oC7Ur-dJ1gvZysdUmiX2iths4FYAcM4g#grid" frameborder="0" allowfullscreen></iframe></div></div>
+            <div id="folder4" class="folder-panel"><h2>GONDOLA 2A</h2><div class="iframe-wrapper"><iframe class="drive-iframe" src="https://drive.google.com/embeddedfolderview?id=1870YvKx42ij7JAnOL2-sNxqLlo70YwRa#grid" frameborder="0" allowfullscreen></iframe></div></div>
+            <div id="folder5" class="folder-panel"><h2>GONDOLA 4A</h2><div class="iframe-wrapper"><iframe class="drive-iframe" src="https://drive.google.com/embeddedfolderview?id=1UY3vLSQt7PUvl45MbLv7IBhKQL9eGHEo#grid" frameborder="0" allowfullscreen></iframe></div></div>
+            <div id="folder6" class="folder-panel"><h2>GONDOLA 3A</h2><div class="iframe-wrapper"><iframe class="drive-iframe" src="https://drive.google.com/embeddedfolderview?id=1ihhP6h6eXeghfggSs9k1R6twOkr-fQ0Z#grid" frameborder="0" allowfullscreen></iframe></div></div>
+            <div id="folder7" class="folder-panel"><h2>BANER OUT</h2><div class="iframe-wrapper"><iframe class="drive-iframe" src="https://drive.google.com/embeddedfolderview?id=1NugCf2iJ3xdzGWnZO-TrzQvtBOBP6xp4#grid" frameborder="0" allowfullscreen></iframe></div></div>
+            <div id="folder8" class="folder-panel"><h2>PALING MURAH DAN HEBOH</h2><div class="iframe-wrapper"><iframe class="drive-iframe" src="https://drive.google.com/embeddedfolderview?id=15ekMvRcve65WN4AB4AiNCigWHGwfKWSc#grid" frameborder="0" allowfullscreen></iframe></div></div>
+            <div id="folder9" class="folder-panel"><h2>DU DEPAN BELAKANG</h2><div class="iframe-wrapper"><iframe class="drive-iframe" src="https://drive.google.com/embeddedfolderview?id=1J-5q4qv7OXD0syfXaYY365n7_BqLZomG#grid" frameborder="0" allowfullscreen></iframe></div></div>
+            <div id="folder10" class="folder-panel"><h2>Foto Display</h2><div class="iframe-wrapper"><iframe class="drive-iframe" src="https://drive.google.com/embeddedfolderview?id=1aNudOYTh3Yyner-BXlYCzWQyfGQIsC12#grid" frameborder="0" allowfullscreen></iframe></div></div>
+        </div>
+    </div>
+    
+    <div style="position: fixed; bottom: 0; right: 0; width: 1px; height: 1px; overflow: hidden; z-index: -1;">
+        <iframe id="youtubePlayer" width="1" height="1"
+            src="https://www.youtube.com/embed/FnvkYk-UFCk?enablejsapi=1&amp;autoplay=0&amp;loop=1&amp;playlist=FnvkYk-UFCk&amp;controls=0&amp;modestbranding=1&amp;showinfo=0&amp;rel=0"
+            frameborder="0" allow="autoplay; encrypted-media" allowfullscreen>
+        </iframe>
+    </div>
+    
+    <div class="sponsor-section">
+        <h3>SPONSOR & PARTNER DIGITAL RESMI</h3>
+        <div class="sponsor-logos">
+            <a href="#" class="sponsor-logo" title="Sponsor Baru F"><img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTYXJVxUHncGWsQOlYNk6bU5zdTdmZ2A1Rdo7XoCLQdhA&s=10" alt="Sponsor Logo Baru F"></a>
+            <a href="#" class="sponsor-logo" title="Sponsor Baru B"><img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQKSOMR4_sOpEuIb8U0NmAewlqJ8gJnbDbqNGPg-_RgRQ&s=10" alt="Sponsor Logo Baru B"></a>
+            <a href="#" class="sponsor-logo" title="Sponsor Baru C"><img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTnXYByDf5Btagn29z_vBuz5QHUzbkFPt_5GJwcgUbirw&s=10" alt="Sponsor Logo Baru C"></a>
+            <a href="#" class="sponsor-logo" title="Sponsor Baru D"><img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSOAgPuJNlDblbt8MI_ZxOxU7l7xmqR1DB1TOIPsxKp9Q&s=10" alt="Sponsor Logo Baru D"></a>
+            <a href="#" class="sponsor-logo" title="Sponsor Baru 3"><img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcScSQNCUl26jcff6DKSRadlVqLOVRbbFnYPlQhvm9-G7Q&s=10" alt="Sponsor Logo Baru 3"></a>
+            <a href="#" class="sponsor-logo" title="Sponsor Baru 4"><img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTHmxTcAdDaU2mbyRehFLFpJwlinw7MD_fd-z_6m2m-7w&s=10" alt="Sponsor Logo Baru 4"></a>
+            <a href="#" class="sponsor-logo" title="Sponsor Baru 5"><img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSRzkha309rJ_dktUTWtznMHgK0eNbXLEDjwygmPKAlAljA&s=10" alt="Sponsor Logo Baru 5"></a>
+            <a href="#" class="sponsor-logo" title="Sponsor Baru 6"><img src="https://id-test-11.slatic.net/p/54e585539185a0f45d01d804cc9482aa.jpg" alt="Sponsor Logo Baru 6"></a>
+            <a href="#" class="sponsor-logo" title="Sponsor 7 (Lama)"><img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQbW6llLXAWGKQ1CiLuT3RjLxzUWua5d4PCLHRLW_rYy5w&s=10" alt="Sponsor Logo 7"></a>
+            <a href="#" class="sponsor-logo" title="Sponsor 8 (Lama)"><img src="https://laz-img-sg.alicdn.com/p/3d187a36794213ea1d5e2ac30521fb02.jpg" alt="Sponsor Logo 8"></a>
+            <a href="#" class="sponsor-logo" title="Sponsor 10 (Lama)"><img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRkUda2IuOIFXCR9f3uOIsCPxdsTcHgD4wGJq65UNXDZ3rVImJw5pVxK28&s=10" alt="Sponsor Logo 10"></a>
+            <a href="#" class="sponsor-logo" title="Sponsor 11 Partner"><img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSYswG7nac-LWcYNXxiH9qvyE3f4XkrporFHjfhFu3H8A&s=10" alt="Sponsor Logo 11"></a>
+            <a href="#" class="sponsor-logo" title="Sponsor 13 Partner"><img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRtmaOjFEUs5o4bs_J7hKcX5kZhJUysz291Z0Aq4WAV3fHtjgqIgxZNeXMg&s=10" alt="Sponsor Logo 13"></a>
+        </div>
+        <p style="margin-top: 25px; font-size: 0.85em; color: #bdc3c7;">*Partner-partner ini mendukungmu! Cepat selesai, biar bisa rebahan. **Teliti dan Fokus, jangan sampai salah Planogram Gondola!** (Nanti kakek marah lho...)</p>
+    </div>
+    
+    <footer>
+        <p>Dashboard dirancang oleh <span>강패킷</span> | 2025. All Rights Reserved.</p>
+    </footer>
+    
+    <script>
+        // Variabel global untuk menyimpan objek pemutar YouTube dan interval lirik
+        let ytPlayer;
+        let lyricInterval;
+
+        // Data Lirik dengan timestamp (dalam detik)
+        const LYRICS_DATA = [
+            { time: 0, text: "🎶 Selamat bekerja, fokus pada Planogrammu hari ini. Ayo, semangat!" },
+            { time: 5, text: "🎶 Data akurat adalah kunci sukses. Teliti, teliti, jangan sampai ada salah." },
+            { time: 10, text: "🎶 Cek Gondola 1A dan 1B. Pastikan semua produk di tempat yang benar." },
+            { time: 15, text: "🎶 Waktu terus berjalan, target harian harus tercapai. Kita pasti bisa!" },
+            { time: 20, text: "🎶 Selalu utamakan ketepatan. Planogram rapi, hati senang, gaji aman." }
+            // Lirik akan mengulang setelah lirik terakhir selesai.
+        ];
+        let currentLyricIndex = -1; 
+        const LYRIC_CYCLE_DURATION = 25; // Durasi total lirik (20 detik + 5 detik buffer)
+
+        // FUNGSI SINKRONISASI LIRIK
+        function syncLyrics() {
+            if (typeof ytPlayer === 'undefined' || ytPlayer.getPlayerState() !== YT.PlayerState.PLAYING) {
+                return; 
+            }
+
+            const currentTime = ytPlayer.getCurrentTime();
+            const lyricElement = document.getElementById('running-text');
+            const adjustedCurrentTime = currentTime % LYRIC_CYCLE_DURATION; // Looping waktu
+
+            let nextLyricIndex = -1;
+
+            // Cari lirik yang paling sesuai dengan waktu saat ini
+            for (let i = LYRICS_DATA.length - 1; i >= 0; i--) {
+                if (LYRICS_DATA[i].time <= adjustedCurrentTime) {
+                    nextLyricIndex = i;
+                    break;
+                }
+            }
+
+            if (nextLyricIndex !== -1 && nextLyricIndex !== currentLyricIndex) {
+                // Ganti lirik dengan efek fade
+                currentLyricIndex = nextLyricIndex;
+                lyricElement.style.opacity = '0'; // Mulai fade out
+                
+                setTimeout(() => {
+                    lyricElement.innerHTML = LYRICS_DATA[currentLyricIndex].text;
+                    lyricElement.style.opacity = '1'; // Fade in the new text
+                }, 500); // Tunggu waktu transisi fade out
+            } else if (nextLyricIndex === -1 && currentLyricIndex !== -1) {
+                // Jika waktu kembali ke 0 (awal loop), paksa reset
+                currentLyricIndex = -1; 
+            }
+        }
+        
+        // 1. Memuat kode YouTube Iframe API secara asinkron
+        var tag = document.createElement('script');
+        tag.src = "https://www.youtube.com/iframe_api";
+        var firstScriptTag = document.getElementsByTagName('script')[0];
+        firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+
+        // 2. Fungsi yang dipanggil ketika API siap
+        function onYouTubeIframeAPIReady() {
+            ytPlayer = new YT.Player('youtubePlayer', {
+                events: {
+                    'onReady': onPlayerReady,
+                    'onStateChange': onPlayerStateChange
+                }
+            });
+        }
+        
+        function onPlayerReady(event) {
+            // Mute player saat pertama kali dimuat (ini membantu Autoplay).
+            event.target.mute(); 
+        }
+        
+        function onPlayerStateChange(event) {
+            if (event.data === YT.PlayerState.ENDED) {
+                ytPlayer.playVideo();
+            }
+        }
+        
+        // FUNGSI UNTUK TOMBOL MUTE/UNMUTE
+        function unmuteMusic() {
+            const toggleButton = document.getElementById('musicToggle');
+            const lyricElement = document.getElementById('running-text');
+            
+            if (typeof ytPlayer === 'undefined') return; 
+
+            if (ytPlayer.isMuted() || ytPlayer.getPlayerState() === YT.PlayerState.PAUSED || ytPlayer.getPlayerState() === YT.PlayerState.ENDED) {
+                ytPlayer.unMute();
+                ytPlayer.playVideo();
+                toggleButton.innerHTML = '<i class="fas fa-volume-up"></i>';
+                toggleButton.title = 'Hentikan Musik';
+                
+                // MULAI SINKRONISASI LIRIK
+                if (!lyricInterval) {
+                    currentLyricIndex = -1; // Reset index untuk memulai dari awal loop
+                    lyricInterval = setInterval(syncLyrics, 500); // Cek setiap 0.5 detik
+                }
+            } else {
+                ytPlayer.mute();
+                ytPlayer.pauseVideo();
+                toggleButton.innerHTML = '<i class="fas fa-volume-mute"></i>';
+                toggleButton.title = 'Putar Musik';
+                
+                // HENTIKAN SINKRONISASI LIRIK
+                clearInterval(lyricInterval);
+                lyricInterval = null;
+                lyricElement.style.opacity = '0';
+                setTimeout(() => {
+                    lyricElement.innerHTML = '🎶 Musik dijeda. Klik tombol speaker untuk melanjutkan.';
+                    lyricElement.style.opacity = '1';
+                }, 500);
+            }
+        }
+
+        // ===========================================
+        // FUNGSI DROPDOWN & REDIRECT
+        // ===========================================
+        function toggleDropdown() {
+            const content = document.getElementById('apkDropdown');
+            const toggle = document.querySelector('.dropdown-toggle');
+            
+            content.classList.toggle('show');
+            toggle.classList.toggle('active');
+
+            // Aktifkan musik (Unmute & Play) saat Dropdown diklik
+            const musicToggle = document.getElementById('musicToggle');
+            if (typeof ytPlayer !== 'undefined' && ytPlayer.isMuted()) {
+                ytPlayer.unMute();
+                ytPlayer.playVideo();
+                musicToggle.innerHTML = '<i class="fas fa-volume-up"></i>';
+                musicToggle.title = 'Hentikan Musik';
+
+                // Mulai lirik juga
+                if (!lyricInterval) {
+                    currentLyricIndex = -1;
+                    lyricInterval = setInterval(syncLyrics, 500);
+                }
+            }
+        }
+        
+        function redirectToLink(url) {
+            // Membuka link di tab baru
+            window.open(url, '_blank');
+        }
+
+        // ===========================================
+        // FUNGSI LAIN (Slide, Modal, Clock, dll)
+        // ===========================================
+        const ALL_SLIDES = ['slide1']; 
+        
+        function startSlide() {
+            document.getElementById(ALL_SLIDES[0]).classList.add('active'); 
+        }
+
+        function getHourOfDay() {
+            const hour = new Date().getHours();
+            if (hour >= 4 && hour < 10) return "pagi";
+            if (hour >= 10 && hour < 15) return "siang";
+            if (hour >= 15 && hour < 18) return "sore";
+            return "malam";
+        }
+
+        function getGreetingTime(time) {
+             if (time === "pagi") return "Selamat Pagi!";
+             if (time === "siang") return "Selamat Siang!";
+             if (time === "sore") return "Selamat Sore!";
+             if (time === "malam") return "Selamat Malam!";
+             return "Selamat Datang!";
+        }
+
+        const motivasiData = {
+            pagi: [
+                {
+                    image: "https://media.tenor.com/VhxJjl32gd4AAAAe/kakek-sugiono-kakek-sugiyono.png", 
+                    message: "Pagi-pagi semangat! Langsung cek Planogram 1B dan 1A! **GAS POL REM BLONG!** Jangan sampai ada data yang meleset dari penempatan."
+                }
+            ],
+            siang: [
+                {
+                    image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQmk6R66OILcorw2jx30kUxE8DvdttMPddSB9tE2T94hC6YYBAXjUWoELww&s=10", 
+                    message: "Siang hari, cek kembali Gondola 2B dan 2A. **MATA HARUS SUPER TELITI!** Ingat, hari ini target Planogram harus 100% rapi!"
+                }
+            ],
+            sore: [
+                {
+                    image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQnyaZnkkRwQJgWIhrbCxdK9OenYwGHrYP6e9JWaZpadg&s=10", 
+                    message: "Jelang sore, saatnya Gondola 4A, 3A, dan Baner Out. **PLANOGRAM RAPI = GAJI AMAN!** Selesaikan pekerjaanmu, dan nikmati waktu luangmu!"
+                }
+            ],
+            malam: [
+                {
+                    image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT7fH_gI8yGZ7p8K4rL2D5VzX2V3wX6l3g-g_A8S1M52Q&s=10", 
+                    message: "Dashboard ini siap menemanimu di shift malam. **INI BARU CUCU KAKEK!** Teliti setiap detail Planogram. Jangan lupa istirahat yang cukup!"
+                }
+            ]
+        };
+        
+        function showRandomMotivationModal() {
+            const timeOfDay = getHourOfDay();
+            const options = motivasiData[timeOfDay];
+            
+            const selectedItem = options[0];
+            
+            document.getElementById('motivasi-image').src = selectedItem.image;
+            document.getElementById('motivasi-message').innerHTML = selectedItem.message; 
+            document.getElementById('motivasi-greeting').innerHTML = `<p style="font-weight: 700; color: #f1c40f; font-size: 1.2em;">${getGreetingTime(timeOfDay)}</p>`;
+            
+            document.getElementById('welcomeModal').style.display = "flex";
+        }
+
+        function closeModal() {
+            var modal = document.getElementById("welcomeModal");
+            modal.style.display = "none";
+            
+            // 1. Aktifkan Iframe Slide 
+            startSlide();
+            
+            // 2. Tampilkan tab folder default
+            openFolder(null, 'folder1'); 
+            
+            // 3. Mulai memutar Youtube (tanpa suara) DAN MULAI LIRIK
+            if (typeof ytPlayer !== 'undefined' && ytPlayer.playVideo) {
+                if (ytPlayer.getPlayerState() !== YT.PlayerState.PLAYING) {
+                    ytPlayer.playVideo();
+                }
+                
+                // MULAI SINKRONISASI LIRIK
+                if (!lyricInterval) {
+                    currentLyricIndex = -1;
+                    lyricInterval = setInterval(syncLyrics, 500); 
+                }
+            }
+        }
+        
+        function updateClock() {
+            const now = new Date();
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            const seconds = String(now.getSeconds()).padStart(2, '0');
+            const days = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
+            const months = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
+            const dayName = days[now.getDay()];
+            const date = now.getDate();
+            const monthName = months[now.getMonth()];
+            const year = now.getFullYear();
+            const timeString = `${hours}:${minutes}:${seconds}`;
+            const dateString = `${dayName}, ${date} ${monthName} ${year}`;
+            document.getElementById('digital-clock').innerHTML = `${dateString} | <b>${timeString}</b>`;
+        }
+        
+        function openFolder(evt, folderId) {
+            var i, tabcontent, tablinks;
+            
+            tabcontent = document.getElementsByClassName("folder-panel");
+            for (i = 0; i < tabcontent.length; i++) {
+                tabcontent[i].style.display = "none";
+                tabcontent[i].classList.remove("active");
+            }
+            
+            tablinks = document.getElementsByClassName("tab-button");
+            for (i = 0; i < tablinks.length; i++) {
+                tablinks[i].className = tablinks[i].className.replace(" active", "");
+            }
+            
+            document.getElementById(folderId).style.display = "block";
+            document.getElementById(folderId).classList.add("active");
+            
+            if (evt && evt.currentTarget) {
+                evt.currentTarget.className += " active";
+            } else {
+                const targetButton = document.getElementById('btn-' + folderId);
+                if (targetButton) {
+                    targetButton.className += " active";
+                }
+            }
+        }
+        
+        const backgroundImages = [
+            'https://images.unsplash.com/photo-1550751827-4bd374c3f58b?q=80&fm=jpg&crop=entropy&cs=tinysrgb&w=1920&h=1080&fit=crop&rand=1', 
+            'https://images.unsplash.com/photo-1542435503-921c58377b21?q=80&fm=jpg&crop=entropy&cs=tinysrgb&w=1920&h=1080&fit=crop&rand=2', 
+            'https://images.unsplash.com/photo-1557804473-b3c0c16c024d?q=80&fm=jpg&crop=entropy&cs=tinysrgb&w=1920&h=1080&fit=crop&rand=3', 
+            'https://images.unsplash.com/photo-1507679790382-74f76263e634?q=80&fm=jpg&crop=entropy&cs=tinysrgb&w=1920&h=1080&fit=crop&rand=4', 
+            'https://images.unsplash.com/photo-1555066931-4365d14bab8c?q=80&fm=jpg&crop=entropy&cs=tinysrgb&w=1920&h=1080&fit=crop&rand=5', 
+            'https://images.unsplash.com/photo-1517430030087-cd13101c750c?q=80&fm=jpg&crop=entropy&cs=tinysrgb&w=1920&h=1080&fit=crop&rand=6', 
+            'https://images.unsplash.com/photo-1510519138101-570d1dca3d66?q=80&fm=jpg&crop=entropy&cs=tinysrgb&w=1920&h=1080&fit=crop&rand=7', 
+            'https://images.unsplash.com/photo-1522071820081-009f0129c71c?q=80&fm=jpg&crop=entropy&cs=tinysrgb&w=1920&h=1080&fit=crop&rand=8', 
+            'https://images.unsplash.com/photo-1516110833965-0b8cd03045a5?q=80&fm=jpg&crop=entropy&cs=tinysrgb&w=1920&h=1080&fit=rand=9', 
+            'https://images.unsplash.com/photo-1549692520-2c7009402e1b?q=80&fm=jpg&crop=entropy&cs=tinysrgb&w=1920&h=1080&fit=crop&rand=10', 
+            'https://images.unsplash.com/photo-1523800508569-42b3224408b0?q=80&fm=jpg&crop=entropy&cs=tinysrgb&w=1920&h=1080&fit=crop&rand=11', 
+            'https://images.unsplash.com/photo-1508830524288-ac0d516d019f?q=80&fm=jpg&crop=entropy&cs=tinysrgb&w=1920&h=1080&fit=crop&rand=12', 
+            'https://images.unsplash.com/photo-1508214751410-f17e3f4e24da?q=80&fm=jpg&crop=entropy&cs=tinysrgb&w=1920&h=1080&fit=crop&rand=13', 
+            'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?q=80&fm=jpg&crop=entropy&cs=tinysrgb&w=1920&h=1080&fit=crop&rand=14', 
+            'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?q=80&fm=jpg&crop=entropy&cs=tinysrgb&w=1920&h=1080&fit=crop&rand=15', 
+            'https://images.unsplash.com/photo-1526628953301-3e589a604290?q=80&fm=jpg&crop=entropy&cs=tinysrgb&w=1920&h=1080&fit=crop&rand=16', 
+            'https://images.unsplash.com/photo-1511984407871-3d719a77d704?q=80&fm=jpg&crop=entropy&cs=tinysrgb&w=1920&h=1080&fit=crop&rand=17', 
+            'https://images.unsplash.com/photo-1515847053290-95580a187a3e?q=80&fm=jpg&crop=entropy&cs=tinysrgb&w=1920&h=1080&fit=crop&rand=18', 
+            'https://images.unsplash.com/photo-1519389950473-47ba0277781c?q=80&fm=jpg&crop=entropy&cs=tinysrgb&w=1920&h=1080&fit=crop&rand=19', 
+            'https://images.unsplash.com/photo-1507608616111-97b5e4063f6a?q=80&fm=jpg&crop=entropy&cs=tinysrgb&w=1920&h=1080&fit=crop&rand=20' 
+        ];
+
+        let currentImageIndex = 0;
+        const fadeDuration = 3000; 
+        const displayDuration = 5000; 
+        
+        function changeBackground() {
+            const body = document.body;
+            const nextImage = backgroundImages[currentImageIndex];
+            
+            const beforeStyle = document.createElement('style');
+            beforeStyle.textContent = `
+                body:before {
+                    background-image: url('${nextImage}');
+                    opacity: 1; 
+                }
+            `;
+            const existingStyle = document.getElementById('bg-fade-style');
+            if (existingStyle) existingStyle.remove();
+            
+            beforeStyle.id = 'bg-fade-style';
+            document.head.appendChild(beforeStyle);
+            
+            setTimeout(() => {
+                body.style.backgroundImage = `url('${nextImage}')`; 
+                
+                const resetStyle = document.createElement('style');
+                resetStyle.textContent = `
+                    body:before {
+                        opacity: 0; 
+                    }
+                `;
+                const existingResetStyle = document.getElementById('bg-fade-style-reset');
+                if (existingResetStyle) existingResetStyle.remove();
+                
+                resetStyle.id = 'bg-fade-style-reset';
+                document.head.appendChild(resetStyle);
+                
+            }, fadeDuration);
+
+            currentImageIndex = (currentImageIndex + 1) % backgroundImages.length;
+        }
+        
+        function startBackgroundRotation() {
+            document.body.style.backgroundImage = `url('${backgroundImages[currentImageIndex]}')`;
+            currentImageIndex = (currentImageIndex + 1) % backgroundImages.length;
+
+            setTimeout(() => {
+                setInterval(changeBackground, displayDuration);
+            }, fadeDuration);
+        }
+        
+        // ===========================================
+        // INISIALISASI
+        // ===========================================
+        document.addEventListener('DOMContentLoaded', function() {
+            updateClock(); 
+            setInterval(updateClock, 1000); 
+            
+            // Tampilkan modal terlebih dahulu
+            showRandomMotivationModal(); 
+            
+            startBackgroundRotation();
+        });
+    </script>
+</body>
+</html>
